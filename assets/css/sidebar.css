@@ -1,0 +1,88 @@
+aside {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    border-right: 1px solid var(--light-grey);
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+
+    @media (max-width:768px) {
+        display: none;
+        position: fixed;
+        z-index: 500;
+        --base:43px;
+        top: var(--base);
+        height: calc(100vh - var(--base));
+        height: calc(100dvh - var(--base));
+    }
+}
+aside .sidebar-logo {
+    width: 100%;
+    overflow: hidden;
+    font-weight: 600;
+    font-size: 1.4rem;
+    z-index: 10;
+    background-color: light-dark(var(--white),var(--black));
+    padding: 10px 20px;
+}
+aside .sidebar-logo a{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+aside .sidebar-logo img {
+    width: 30px;
+    height: 30px;
+    max-height: 80px;
+    align-self: center;
+}
+/* aside nav ul::-webkit-scrollbar {
+    display: none;
+} */
+aside nav ul{
+    width: 100%;
+    height: calc(100vh - 50px );
+    height: calc(100dvh - 50px );
+    overflow-y: scroll;
+    overflow-x: hidden;
+    font-size: 1.1rem;
+    padding: 20px 20px;
+}
+aside nav ul li {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    list-style: none;
+}
+aside nav ul li a {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+}
+aside nav ul li a:hover , aside nav ul li a.active{
+    background-color: light-dark(var(--blue),var(--yellow));
+    color: light-dark(var(--white),var(--black));
+    border-radius: 5px;
+
+    & i {
+        color: light-dark(var(--yellow),var(--blue));
+    }
+}
+aside hr {
+    width: 100%;
+    border: 1px solid var(--light-grey);
+    margin: 15px 0;
+}
+aside .ke-social-links {
+    width: 100%;
+    padding:0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 10px;
+}

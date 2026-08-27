@@ -1,0 +1,368 @@
+* {
+    margin: 0;
+    padding: 0;
+    outline:none;
+    border: none;
+    box-sizing: border-box;
+    font-style: normal;
+    user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+}
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: light-dark(var(--black),var(--black));
+    background-image: none;
+    color: light-dark(var(--black),var(--white));
+    overflow: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+#st-2.st-left , #onesignal-bell-container.onesignal-reset .onesignal-bell-launcher.onesignal-bell-launcher-md .onesignal-bell-launcher-button {
+    display: none !important;
+}
+
+.ads-container:has(ins.adsbygoogle[data-ad-status="unfilled"]) {
+    display: none !important;
+}
+
+.embed-video-container {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    display: grid;
+}
+
+.video-iframe-container{
+    width: 100%;
+    height: calc(100vh - 75px);
+    height: calc(100dvh - 75px);
+    overflow: hidden;
+    position: relative;
+
+    @media (max-width: 360px) {
+        height: calc(100vh - 65px);
+        height: calc(100dvh - 65px);
+    }
+}
+.video-iframe-container .video-container{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.video-iframe-container .ads-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 400;
+    display: block;
+    background-color: var(--black);
+}
+.video-iframe-container .live-chat-container {
+    width: clamp(200px, 380px, 450px);
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 360;
+    display: none;
+    background-color: var(--black);
+
+    @media (max-width:400px) {
+        width: 100%;
+        right: 0;
+    }
+}
+.video-iframe-container .live-chat-container iframe{
+    width: 100%;
+    height: 100%;
+}
+.live-chat-container.active {
+    display: block;
+}
+
+#m3u8Layer {
+    display: none !important;
+}
+
+.video-iframe-container video,
+.video-iframe-container .video-js , #smcplayer_html5_api{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: none !important;
+    outline: none;
+    object-fit: fill;
+    overflow: hidden;
+}
+.video-iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: none !important;
+    outline: none;
+    object-fit: contain;
+    overflow: hidden;
+}
+
+.video-js .vjs-tech , #smcplayer_html5_api{
+    overflow: hidden;
+}
+
+.channel-name-status-reload-container {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background-color: light-dark(var(--light-white),var(--black));
+    color: light-dark(var(--black),var(--white));
+    overflow: hidden;
+    border-top: 1px solid light-dark(var(--black),var(--light-white));
+    z-index: 999;
+}
+
+.channel-name-status-reload-container .channel-name {
+    width: max-content;
+    font-size: 1.3rem;
+    font-weight: 580;
+    letter-spacing: 1px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+    color: light-dark(var(--black),var(--orange));
+}
+.channel-name-status-reload-container .channel-name a{
+    text-decoration: none;
+    color: inherit;
+}
+
+.channel-name-status-reload-container .channel-status::after {
+    width: fit-content;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    font-size: 1rem;
+    font-weight: 550;
+    border-radius: 5px;
+    border: 2px solid var(--light-white);
+    text-transform: uppercase;
+}
+
+@container style(--isLive:true) {
+    .channel-name-status-reload-container .channel-status::after {
+        content: 'LIVE';
+        background-color: var(--red);
+        color: var(--white);
+        
+    }
+}
+@container style(--isLive:false) {
+    .channel-name-status-reload-container .channel-status::after {
+        content: 'OFF AIR';
+        background-color: var(--green);
+        color: var(--white);
+    }
+}
+
+.channel-name-status-reload-container .reload-button-tv-schedule {
+    max-width: 70%;
+    padding: 2px 2px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    overflow: hidden;
+}
+.channel-name-status-reload-container .reload-container {
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 550;
+    border-radius: 25px;
+    border: 1px solid light-dark(var(--black),var(--light-white));
+    cursor: pointer;
+}
+.channel-name-status-reload-container .tv-schedule-list-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.6rem;
+    font-weight: 550;
+    cursor: pointer;
+}
+.channel-name-status-reload-container .live-chat-button {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.6rem;
+    font-weight: 550;
+    cursor: pointer;
+}
+
+.channel-name-status-reload-container .reload-container::after {
+    content: 'Reload';
+}
+
+.vjs-control-bar {
+    font-size: 15px;
+}
+@media (max-width:600px) {
+    .channel-name {
+        max-width: calc(100% - 50px);
+    }
+    .channel-status {
+        display: none;
+    }
+}
+@media (min-height:550px) and (min-width:300px) {
+    .video-iframe-container video, .video-iframe-container .video-js {
+        object-fit: contain;
+    }
+    .video-iframe-container iframe {
+        object-fit: contain;
+    }
+}
+@media (max-height:600px) and (orientation:landscape) {
+    .video-iframe-container video, .video-iframe-container .video-js {
+        object-fit: fill;
+    }
+    .video-iframe-container iframe {
+        object-fit: contain;
+    }
+}
+@media (max-width:600px) and (min-height:500px) {
+    .video-iframe-container iframe, .video-iframe-container video, .video-iframe-container .video-js {
+        object-fit: contain;
+    }
+}
+
+
+
+
+
+/* programme schedule  */
+.schedule-list-container {
+    width: 100%;
+    height:100%;
+    border-radius: 0 !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: light-dark(var(--white),var(--black));
+    color: light-dark(var(--black),var(--white));
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 0 !important;
+    z-index: 9999999;
+    overflow: hidden;
+    display: none;
+}
+.schedule-list-container .ads-container {
+    width: 100%;
+    height: fit-content;
+    position: static;
+}
+.schedule-list-container.active {
+    display: block;
+}
+.schedule-list-container .schedule-title {
+    width: 100%;
+    font-weight: 620;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--light-grey);
+    padding: 10px;
+    margin-bottom: 0;
+}
+
+.schedule-list-container .schedule-list {
+    width: 100%;
+    max-height: calc(100% - 52px);
+    padding: 10px 10px 20px 10px;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(min(100%,280px),1fr));
+    overflow: auto;
+    gap: 15px;
+
+    @media (max-width:360px) {
+        max-height: calc(100% - 82px);
+        padding: 10px 10px 20px 10px;
+    }
+}
+@media (max-width:400px) {
+    .schedule-list-container {
+        border-radius: none;
+    }
+    .schedule-list-container .schedule-list {
+        gap: 10px;
+    }
+}
+
+.schedule-list-container .schedule-item {
+    width: 100%;
+    height: fit-content;
+    background-color: light-dark(var(--white),var(--black));
+    color: light-dark(var(--black),var(--white));
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px light-dark(rgba(0, 0, 0, 0.1),var(--light-grey));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+.schedule-list-container .schedule-item.active .show-name{
+    color: light-dark(var(--black),var(--white));
+}
+
+
+@media (max-width:400px) {
+    .schedule-list-container .schedule-list {
+        padding: 10px 10px 20px 10px;
+    }
+    .channel-name-status-reload-container {
+        padding: 20px 10px;
+    }
+    .channel-name-status-reload-container .channel-name {
+        max-width: calc(100% - 125px);
+    }
+    .channel-name-status-reload-container .reload-container::after {
+        content: '';
+        display: none;
+    } 
+    .channel-name-status-reload-container .reload-container {
+        width: 30px;
+        height: 30px;
+        aspect-ratio: 1/1;
+        justify-content: center;
+        flex-direction: column;
+        padding: 2px 2px;
+        border-radius: 50%;
+        letter-spacing: 1px;
+    }
+}

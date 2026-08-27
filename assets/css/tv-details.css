@@ -1,0 +1,397 @@
+.ke-first-column {
+    width: 100%;
+    height: auto;
+    display: grid;
+    gap: 20px;
+    
+    & .ke-video-player-container {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background-color: var(--black);
+        position: relative;
+        overflow: hidden;
+
+        & .ke-video-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background-color: var(--black);
+            position: relative;
+            overflow: hidden;
+
+            & :where(video , iframe , embed) {
+                width: 100%;
+                height: 100%;
+                top: 0;left: 0;
+                position: absolute;
+                /* display: none; */
+            }
+
+        }
+        & .ke-video-availability-container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: absolute;
+            top: 0;left: 0;
+            background-color: light-dark(var(--black),var(--white));
+            display: none;
+
+            & .video-availability-message {
+                width: 100%;
+                height: 100%;
+                padding: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                z-index: 100;
+                color: light-dark(var(--white),var(--black));
+
+                & .status-off-air , .status-website-only , .status-app-only , .status-restricted , .status-maintenance {
+                    width: 100%;
+                }
+            }
+        }
+    }
+    & .ke-channel-small-info {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        & .channel-icon {
+            width: 80px;
+            height: 80px;
+            padding: 10px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            align-self: flex-start;
+            background-color: light-dark(var(--white),var(--black));
+
+            & img {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+        }
+
+        & .channel-metadata {
+            width: calc(100% - 90px);
+            display: flex;
+            align-self: center;
+            flex-direction: column;
+            gap: 8px;
+
+            & .channel-row {
+                display: flex;
+                justify-content: space-between;
+
+                & .first-row {
+
+                    & .single-radio-status {
+                        width: fit-content;
+                        margin-top: 4px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: start;
+                        padding: 2px 10px;
+                        border-radius: 25px;
+                        letter-spacing: 1px;
+                        text-align: center;
+                        font-size: 1rem;
+                        font-weight: 500;
+                        overflow: hidden;
+
+                        &.live{
+                            background-color: var(--red); 
+                            color: light-dark(var(--white),var(--white));
+                        }
+
+                        &:where(.loading ,.error , .mute ,.paused){
+                            background-color: transparent;
+                            border: 2px solid light-dark(var(--black),var(--white));
+                            color: light-dark(var(--black),var(--white));
+                        }
+                    }
+                }
+
+                & .second-row {
+                    width: fit-content;
+                    overflow: hidden;
+
+                    & .ke-audio-player {
+                        background-color: light-dark(var(--white),var(--light-white));
+                        color: light-dark(var(--black),var(--black));
+                        width: fit-content;
+                        height: fit-content;
+                        padding: 8px;
+                        display: flex;
+                        gap: 10px;
+                        flex-direction: column;
+                        border-radius: 25px;
+                        overflow: hidden;
+                        /* box-shadow: 0 0 10px 5px var(--light-grey); */
+                        z-index: 5;
+
+                        & .icon-buttons {
+                            aspect-ratio: 1/1;
+                            overflow: hidden;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+
+                            & i {
+                                font-size: 1.3rem;
+                                cursor: pointer;
+                            }
+                            & #play-pause {
+                                font-size: 1.5rem;
+                            }
+                        }
+                    }
+                }
+            }
+
+            & h1 {
+                font-size: 1.6rem;
+                letter-spacing: 0.5px;
+            }
+            & .channel-stats {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 0.9rem;
+                color: light-dark(var(--black),var(--white));
+            }
+            & .channel-social-media-share-button {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 12px;
+                font-size: 1.2rem;
+
+                & .fa-heart.active {
+                    color: var(--red);
+                    font-weight: 600;
+                }
+            }
+
+        }
+    }
+    & .ke-channel-description-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        & .ke-area-holder {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+
+            & i {
+                color: light-dark(var(--blue),var(--yellow));
+                font-weight: 400;
+            }
+        }
+        & .ke-channel-description {
+            width: 100%;
+            font-weight: 400;
+            font-size: 1rem;
+            padding: 20px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--grey);
+            border-left: 4px solid light-dark(var(--blue),var(--yellow));
+        }
+    }
+    & .ke-more-channels-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow: hidden;
+
+        & .ke-area-holder {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+
+            & i {
+                color: light-dark(var(--blue),var(--yellow));
+            }
+        }
+        & .ke-channel-lists {
+            width: 100%;
+            padding: 20px 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(100px,1fr));
+            gap: 10px;
+            grid-auto-flow: column;
+            grid-column: 100px;
+            overflow-x: scroll;
+            overflow-y: hidden;
+
+            & .ke-channel-card {
+                width: 100%;
+                padding: 5px;
+                border-radius: 5px;
+                background-color: light-dark(var(--white),var(--black)) ;
+
+                & .channel-image {
+                    width: 90px;
+                    height: 90px;
+                    position: relative;
+                    border-radius: 5px;
+                    margin-bottom: 15px;
+                    
+                    & img {
+                        width: 100%;
+                        height: 100%;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        border-radius: 15px;
+                    }
+
+                    & .channel-status {
+                        width: fit-content;
+                        height: fit-content;
+                        padding: 2px 4px;
+                        border-radius: 5px;
+                        position: absolute;
+                        z-index: 5;
+                        transform: translate(50%,-50%);
+                        /* bottom: -10px; */
+                        white-space: nowrap;
+                        background-color: var(--black);
+                        color: var(--white);
+                        font-size: 0.9rem;
+
+                        &.live-now {
+                            background-color: var(--red);
+                        }
+
+                        &.off-air {
+                            background-color: var(--green);
+                        }
+                    }
+                }
+
+                & .channel-name {
+                    width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    letter-spacing: 0.5px;
+                }
+            }
+        }
+    }
+}
+
+.ke-second-column {
+    width: 100%;
+    max-height: 600px;
+    padding: 0 0 20px;
+    display: grid;
+    gap: 20px;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 60px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+
+    & .ads-container {
+        width: 100%;
+        overflow: hidden;
+        min-height: 200px;
+        background-color: light-dark(var(--white),var(--light-grey));
+    }
+    & .ke-item-lists-container {
+        width: 100%;
+        display: grid;
+        gap: 20px;
+
+        & .area-label {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+
+            & i {
+                color: light-dark(var(--blue),var(--yellow));
+            }
+        }
+        & .item-card-container {
+            width: 100%;
+            display: grid;
+            gap: 10px;
+
+            & .ke-item-card {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                & a:where(img) {
+                    width: 40px;
+                    height: 40px;
+                    overflow: hidden;
+                }
+
+                & img {
+                    width: 40px;
+                    height: 40px;
+                    align-self: flex-start;
+                    border-radius: 5px;
+                }
+                & .card-metadata {
+                    display: flex;
+                    align-self: flex-start;
+                    flex-direction: column;
+                    font-size: 0.9rem;
+                    gap: 6px;
+
+                    & strong {
+                        letter-spacing: 0.5px;
+                        font-weight: 550;
+                    }
+                    & .row-items {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 5px;
+
+                        & span {
+                            display: flex;
+                            gap: 5px;
+                            align-items: center;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            font-size: 0.8rem;
+                        }
+                    }
+                    & i {
+                        font-size: 0.8rem;
+                    }
+                }
+            }
+        }
+    }
+}

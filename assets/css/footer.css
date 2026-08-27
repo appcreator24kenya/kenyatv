@@ -1,0 +1,16 @@
+del {
+    text-decoration: line-through;
+}
+
+
+footer {
+    width: 100%;
+    height:fit-content;
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: 50px;
+    background-color: light-dark(var(--white),var(--black));
+    color: light-dark(var(--black),var(--white)) ;
+    border-top: 1px solid light-dark(var(--black),var(--light-white));
+    display: none;
+}
