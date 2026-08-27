@@ -1,0 +1,18 @@
+[21-Aug-2026 11:51:59 UTC] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xamp\htdocs\kenyatv\config\db.php on line 13
+[21-Aug-2026 14:31:59 UTC] PHP Parse error:  syntax error, unexpected token "function" in C:\xamp\htdocs\kenyatv\inc\sidebar.php on line 3
+[21-Aug-2026 16:15:42 UTC] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xamp\htdocs\kenyatv\config\db.php on line 13
+[27-Aug-2026 11:43:35 Europe/Berlin] PHP Warning:  require(C:\xamp\htdocs\kenyatv/pages/news.php): Failed to open stream: No such file or directory in C:\xamp\htdocs\kenyatv\index.php on line 42
+[27-Aug-2026 11:43:36 Europe/Berlin] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\xamp\htdocs\kenyatv/pages/news.php' (include_path='C:\xamp\php\PEAR') in C:\xamp\htdocs\kenyatv\index.php:42
+Stack trace:
+#0 {main}
+  thrown in C:\xamp\htdocs\kenyatv\index.php on line 42
+[27-Aug-2026 11:53:29 Europe/Berlin] PHP Warning:  require(C:\xamp\htdocs\kenyatv/pages/recently-watched.php): Failed to open stream: No such file or directory in C:\xamp\htdocs\kenyatv\index.php on line 42
+[27-Aug-2026 11:53:29 Europe/Berlin] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\xamp\htdocs\kenyatv/pages/recently-watched.php' (include_path='C:\xamp\php\PEAR') in C:\xamp\htdocs\kenyatv\index.php:42
+Stack trace:
+#0 {main}
+  thrown in C:\xamp\htdocs\kenyatv\index.php on line 42
+[27-Aug-2026 15:36:21 Europe/Berlin] PHP Warning:  require(C:\xamp\htdocs\kenyatv/pages/app.php): Failed to open stream: No such file or directory in C:\xamp\htdocs\kenyatv\index.php on line 43
+[27-Aug-2026 15:36:21 Europe/Berlin] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\xamp\htdocs\kenyatv/pages/app.php' (include_path='C:\xamp\php\PEAR') in C:\xamp\htdocs\kenyatv\index.php:43
+Stack trace:
+#0 {main}
+  thrown in C:\xamp\htdocs\kenyatv\index.php on line 43
