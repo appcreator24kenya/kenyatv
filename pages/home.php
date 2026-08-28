@@ -1,5 +1,92 @@
 <?php
+    $all_channels = fetchCountRowsInAllTables('channels');
+    $all_radios = fetchCountRowsInAllTables('radios');
+    $all_soaps = fetchCountRowsInAllTables('soaps');
+    $all_setbooks = fetchCountRowsInAllTables('setbooks');
+    $all_news = fetchCountRowsInAllTables('news');
+    $live_users = fetchCountRowsInAllTables('online_viewers'); 
+
+    // Fetch all TV and radio schedules
+    $tvSchedules = fetchAllTVSchedule() ?? [];
+    $radioSchedules = fetchAllRadioSchedule() ?? [];
+
+
+    $channels = fetchTVList() ?? [];
+    $top_channels =  fetchMostWatchedTV() ?? [];
+    $most_rated_tv = fetchRatedTV() ?? [];
+
+    $allChannels = array();
+    if($channels){
+        foreach ($channels as $index => $row){
+            $allChannels[$index]['id'] = $row['id'];
+            $allChannels[$index]['channel_name'] = $row['channel_name'];
+            $allChannels[$index]['channel_slug'] = $row['channel_slug'];
+            $allChannels[$index]['channel_icon'] = $row['channel_icon'];
+            $allChannels[$index]['tv_embed_code'] = $row['tv_embed_code'];
+            $allChannels[$index]['tv_description'] = $row['tv_description'];
+            $allChannels[$index]['status'] = $row['status'];
+            $allChannels[$index]['channel_poster'] = $row['channel_poster'];
+            $allChannels[$index]['viewed'] = $row['viewed'];
+            $allChannels[$index]['created'] = $row['created'];
+            
+            $index++;
+        }
+    }
+
+    //echo '<pre>';print_r($allChannels);exit;
     
+    $radios = fetchRadioList() ?? [];
+    $top_radios = fetchMostListenedRadios() ?? [];
+    $most_rated = fetchRatedRadios() ?? [];
+    $allRadioCategory = fetchRadioCategories() ?? [];
+    
+    $allRadios = array();
+    if($radios){
+        foreach ($radios as $index => $row){
+            $allRadios[$index]['id'] = $row['id'];
+            $allRadios[$index]['radio_name'] = $row['radio_name'];
+            $allRadios[$index]['radio_slug'] = $row['radio_slug'];
+            $allRadios[$index]['status'] = $row['status'];
+            $allRadios[$index]['showviews'] = $row['showviews'];
+            $allRadios[$index]['average_rating'] = $row['average_rating'];
+            $allRadios[$index]['radio_description'] = $row['radio_description'];
+            $allRadios[$index]['frequency'] = $row['frequency'];
+            $allRadios[$index]['radio_poster'] = $row['radio_poster'];
+            $allRadios[$index]['radio_icon'] = $row['radio_icon'];
+            $allRadios[$index]['viewed'] = $row['viewed'];
+            
+            $index++;
+        }
+    }
+    
+    
+    // get recently watched tv
+    $recentlyWatchedTV = [];
+    if (isset($_COOKIE['recently_listened_tv'])) {
+        $recentlyWatchedTV = json_decode($_COOKIE['recently_listened_tv'], true);
+        if (is_null($recentlyWatchedTV)) {
+            $recentlyWatchedTV = [];
+        }
+    }
+
+    // get recently listened radios
+    $recentlyListenedRadios = [];
+    if (isset($_COOKIE['recently_listened'])) {
+        $recentlyListened = json_decode($_COOKIE['recently_listened'], true);
+        if (!is_null($recentlyListened)) {
+            foreach ($recentlyListened as $radioId) {
+                foreach ($radios as $radio) {
+                    if ($radio['id'] == $radioId) {
+                        $recentlyListenedRadios[] = $radio;
+                        break;
+                    }
+                }
+            }
+            usort($recentlyListenedRadios, function($a, $b) use ($recentlyListened) {
+                return array_search($a['id'], $recentlyListened) - array_search($b['id'], $recentlyListened);
+            });
+        }
+    }
 
     // seo meta tags
     // $meta_title = "Kenya Live TV | Kenya TV Channels | Kenya TV Stations";
@@ -73,392 +160,202 @@
     <main>
         <!--wordpress header  -->
         <?php  require_once __DIR__ . '/../inc/header.php'; ?>
-        <div class="ads-container"></div>
+        <div class="ads-container"><?= getAdsenseAd('horizontal', 'auto'); ?></div>
         <section class="ke-two-column-layout">
             <div class="ke-first-column">
+                <?php if (!empty($recentlyWatchedTV) && !empty($allChannels)) { ?>
                 <div class="ke-more-channels-container">
                     <div class="ke-area-holder"><i class="fa fa-clock-rotate-left"></i>Continue Watching</div>
                     <div class="ke-channel-lists">
+                        <?php
+                            // Limit recently watched TV IDs to 3
+                            $limitedRecentlyWatchedTV = array_slice($recentlyWatchedTV, 0, 5);
+
+                            // Loop through the recently watched TV IDs
+                            foreach ($limitedRecentlyWatchedTV as $watchedId) {
+                            // Find the matching channel in $allChannels
+                            foreach ($allChannels as $channel) {
+                                if ($channel['id'] == $watchedId) {
+                        ?>
                         <div class="ke-channel-card">
                             <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
+                                <a href="<?= BASE_URL . "/tv/" . $channel['channel_slug']; ?>">
+                                    <img src="<?= $channel['channel_icon']; ?>" loading="lazy" alt="<?= $channel['channel_name']; ?>">
+                                </a>
+                                <div class="channel-status <?= ($channel['status'] == 'Live Now') ? ' live-now' : ' off-air'; ?>"><?= $channel['status']; ?></div>
                             </div>
-                            <div class="channel-name">Citizen TV</div>
+                            <div class="channel-name"><?= $channel['channel_name']; ?></div>
                         </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Off Air</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Off  Air</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
+                        <?php break; } } } ?>
                     </div>
                 </div>
-                <div class="ke-more-channels-container">
-                    <div class="ke-area-holder"><i class="fa fa-clock-rotate-left"></i>Continue Listening</div>
-                    <div class="ke-channel-lists">
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
+                <?php } ?>
+                <?php if (!empty($recentlyListened)) { ?>
+                    <div class="ke-more-channels-container">
+                        <div class="ke-area-holder"><i class="fa fa-clock-rotate-left"></i>Continue Listening</div>
+                        <div class="ke-channel-lists">
+                            <?php
+                                // Limit the number of recently listened radios to 3
+                                $recentlyListenedLimited = array_slice($recentlyListened, 0, 5);
+
+                                // Loop through the recently watched radio IDs
+                                foreach ($recentlyListenedLimited as $watchedId) {
+                                    // Find the matching radio in $allRadios
+                                    foreach ($allRadios as $radio) {
+                                        if ($radio['id'] == $watchedId) {
+                            ?>
+                            <div class="ke-channel-card">
+                                <div class="channel-image">
+                                    <a href="<?= BASE_URL . "/radio/" . $radio['radio_slug']; ?>">
+                                        <img src="<?= $radio['radio_icon']; ?>" loading="lazy" alt="<?= $radio['radio_name']; ?>">
+                                    </a>
+                                    <div class="channel-status <?= ($radio['status'] == 'Live Now') ? ' live-now' : ' off-air'; ?>"><?= $radio['status']; ?></div>
+                                </div>
+                                <div class="channel-name"><?= $radio['radio_name']; ?></div>
                             </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Off Air</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Off  Air</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
+                            <?php break; } } } ?>
                         </div>
                     </div>
-                </div>
-                <div class="ads-container"></div>
+                <?php } ?>
+                <?php if (!empty($recentlyWatchedTV) || !empty($recentlyListened)) { ?>
+                <div class="ads-container"><?= getAdsenseAd('horizontal', 'auto'); ?></div>
+                <?php } ?>
                 <div class="ke-more-channels-container">
                     <div class="ke-area-holder"><i class="fa-solid fa-arrow-trend-up"></i>Popular TV Channels</div>
                     <div class="ke-channel-lists">
+                        <?php 
+                            $limitedChannels = array_slice($top_channels, 0, 7);
+                            foreach ($limitedChannels as $key => $row): // Add $key to get the index of the array
+                            $id = $row['id'];
+                            $channel_name= trim($row['channel_name']);
+                            $channel_icon= $row['channel_icon'];
+                            $channel_slug = $row['channel_slug'];
+                            $channel_poster = $row['channel_poster'];
+                            $status = $row['status'];
+                            $viewed = $row['viewed'];
+
+                        ?>
                         <div class="ke-channel-card">
                             <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
+                                <a href="<?= BASE_URL . "/tv/" . $channel_slug; ?>">
+                                    <img src="<?= $channel_icon; ?>" loading="lazy" alt="<?= $channel_name; ?>">
+                                </a>
+                                <div class="channel-status <?= ($status == 'Live Now') ? ' live-now' : ' off-air'; ?>"><?= $status; ?></div>
                             </div>
-                            <div class="channel-name">Citizen TV</div>
+                            <div class="channel-name"><?= $channel_name; ?></div>
                         </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <div class="ke-more-channels-container">
                     <div class="ke-area-holder"><i class="fa-solid fa-arrow-trend-up"></i>Popular Radio Stations</div>
                     <div class="ke-channel-lists">
+                        <?php 
+                            $limitedTopRadios = array_slice($top_radios, 0, 8);
+                            foreach ($limitedTopRadios as $key => $row):
+                                $id = $row['id'];
+                                $radio_name = trim($row['radio_name']);
+                                $radio_slug = $row['radio_slug'];
+                                $status = $row['status'];
+                                $frequency = $row['frequency'];
+                                $radio_icon = $row['radio_icon'];
+                                $viewed = $row['viewed'];
+                                $average_rating = $row['average_rating'];
+                        ?>
                         <div class="ke-channel-card">
                             <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
+                                <a href="<?= BASE_URL . "/radio/" . $radio_slug; ?>">
+                                    <img src="<?= $radio_icon; ?>" loading="lazy" alt="<?= $radio_name; ?>">
+                                </a>
+                                <div class="channel-status <?= ($status == 'Live Now') ? ' live-now' : ' off-air'; ?>"><?= $status; ?></div>
                             </div>
-                            <div class="channel-name">Radio Citizen</div>
+                            <div class="channel-name"><?= $radio_name; ?></div>
                         </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Radio Citizen</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Radio Citizen</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Radio Citizen</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Radio Citizen</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Radio Citizen</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Radio Citizen</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Radio Citizen</div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <div class="ke-more-channels-container">
                     <div class="ke-area-holder"><i class="fa-solid fa-list"></i>Radio Categories</div>
                     <div class="ke-radio-categories-container">
                         <div class="ke-radio-categories-lists">
+                            <?php if($allRadioCategory) {
+                                foreach($allRadioCategory as $row){
+                            ?>
                             <div class="radio-category-card">
-                                <a href="">
+                                <a href="<?= BASE_URL .'/radio/category/'.$row['category_slug']; ?>">
                                     <i class="fa fa-location"></i>
                                     <div class="radio-category-metadata">
-                                        <div class="radio-category-name">Christian Radio Stations</div>
-                                        <div class="radio-category-stats">45 stations</div>
+                                        <div class="radio-category-name"><?= $row['category_name']; ?></div>
+                                        <div class="radio-category-stats"><?= $row['total_radios']. ' Stations'; ?></div>
                                     </div>
                                 </a>
                             </div>
-                            <div class="radio-category-card">
-                                <a href="">
-                                    <i class="fa fa-location"></i>
-                                    <div class="radio-category-metadata">
-                                        <div class="radio-category-name">Luo Radio Stations</div>
-                                        <div class="radio-category-stats">16 stations</div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="radio-category-card">
-                                <a href="">
-                                    <i class="fa fa-location"></i>
-                                    <div class="radio-category-metadata">
-                                        <div class="radio-category-name">Kikuyu Radio Stations</div>
-                                        <div class="radio-category-stats">26 stations</div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="radio-category-card">
-                                <a href="">
-                                    <i class="fa fa-location"></i>
-                                    <div class="radio-category-metadata">
-                                        <div class="radio-category-name">Kamba Radio Stations</div>
-                                        <div class="radio-category-stats">12 stations</div>
-                                    </div>
-                                </a>
-                            </div>
+                            <?php } }?>
                         </div>
                     </div>
                 </div>
-                <div class="ads-container"></div>
+                <div class="ads-container"><?= getAdsenseAd('horizontal', 'auto'); ?></div>
             </div>
             <div class="ke-second-column">
-                <div class="ads-container"></div>
+                <div class="ads-container"><?= getAdsenseAd('square', 'auto'); ?></div>
                 <div class="ke-item-lists-container">
                     <div class="area-label"><i class="far fa-star"></i> Best Rated TV</div>
                     <div class="item-card-container">
+                        <?php
+                            $limitedRatedTV = array_slice($most_rated_tv, 0, 6);
+                            foreach ($limitedRatedTV as $key => $row):
+                                $id = $row['id'];
+                                $channel_name = str_replace("Live", "", trim($row['channel_name']));
+                                $status = $row['status'];
+                                $channel_icon = $row['channel_icon'];
+                                $viewed = $row['viewed'];
+                                $average_rating = $row['average_rating'];
+                        ?>
                         <div class="ke-item-card">
-                            <a href=""><img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt=""></a>
+                            <a href="<?= BASE_URL .'/tv/' . $row['channel_slug']; ?>">
+                                <img src="<?= $channel_icon; ?>" alt="<?= $channel_name; ?>">
+                            </a>
                             <div class="card-metadata">
-                                <strong><a href="">Citizen TV</a></strong>
+                                <strong><a href="<?= BASE_URL .'/tv/' . $row['channel_slug']; ?>"><?= $channel_name; ?></a></strong>
                                 <div class="row-items">
-                                    <span><i class="fa fa-tower-cell"></i> 103.0 FM</span>
-                                    <span><i class="far fa-headphones"></i> 20.1K</span>
-                                    <span><i class="far fa-star"></i> 4.9</span>
+                                    <span><i class="far fa-eye"></i> <?= formatNumber($viewed) ?></span>
+                                    <span><i class="far fa-star"></i> <?= $average_rating; ?></span>
                                 </div>
                             </div>
                         </div>
-                        <div class="ke-item-card">
-                            <a href=""><img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt=""></a>
-                            <div class="card-metadata">
-                                <strong><a href="">Citizen TV</a></strong>
-                                <div class="row-items">
-                                    <span><i class="far fa-eye"></i> 1.4 M </span>
-                                    <span><i class="far fa-star"></i> 4.9</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ke-item-card">
-                            <a href=""><img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt=""></a>
-                            <div class="card-metadata">
-                                <strong><a href="">Citizen TV</a></strong>
-                                <div class="row-items">
-                                    <span><i class="far fa-eye"></i> 1.4 M </span>
-                                    <span><i class="far fa-star"></i> 4.9</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ke-item-card">
-                            <a href=""><img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt=""></a>
-                            <div class="card-metadata">
-                                <strong><a href="">Citizen TV</a></strong>
-                                <div class="row-items">
-                                    <span><i class="far fa-eye"></i> 1.4 M </span>
-                                    <span><i class="far fa-star"></i> 4.9</span>
-                                </div>
-                            </div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
-                <div class="ads-container"></div>
+                <div class="ads-container"><?= getAdsenseAd('square', 'auto'); ?></div>
                 <div class="ke-item-lists-container">
                     <div class="area-label"><i class="far fa-star"></i> Best Rated Radios</div>
                     <div class="item-card-container">
+                        <?php
+                            $limitedRatedRadio = array_slice($most_rated, 0, 6);
+                            foreach ($limitedRatedRadio as $key => $row):
+                                $id = $row['id'];
+                                $radio_name = str_replace("Live", "", trim($row['radio_name']));
+                                $status = $row['status'];
+                                $frequency = ($row['frequency']) ? $row['frequency'] .' FM' : 'Online';
+                                $radio_icon = $row['radio_icon'];
+                                $viewed = $row['viewed'];
+                                $reviews = $row['reviews'];
+                                $average_rating = $row['average_rating'];
+                        ?>
                         <div class="ke-item-card">
-                            <a href=""><img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt=""></a>
+                            <a href="<?= BASE_URL .'/radio/' . $row['radio_slug']; ?>">
+                                <img src="<?= $radio_icon; ?>" alt="<?= $radio_name; ?>">
+                            </a>
                             <div class="card-metadata">
-                                <strong><a href="">Citizen TV</a></strong>
+                                <strong><a href="<?= BASE_URL .'/radio/' . $row['radio_slug']; ?>"><?= $radio_name; ?></a></strong>
                                 <div class="row-items">
-                                    <span><i class="fa fa-tower-cell"></i> 103.0 FM</span>
-                                    <span><i class="far fa-headphones"></i> 20.1K</span>
-                                    <span><i class="far fa-star"></i> 4.9</span>
+                                    <span><i class="fa fa-tower-cell"></i> <?= $frequency; ?></span>
+                                    <span><i class="far fa-headphones"></i> <?= formatNumber($viewed) ?></span>
+                                    <span><i class="far fa-star"></i> <?= $average_rating; ?></span>
                                 </div>
                             </div>
                         </div>
-                        <div class="ke-item-card">
-                            <a href=""><img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt=""></a>
-                            <div class="card-metadata">
-                                <strong><a href="">Citizen TV</a></strong>
-                                <div class="row-items">
-                                    <span><i class="far fa-eye"></i> 1.4 M </span>
-                                    <span><i class="far fa-star"></i> 4.9</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ke-item-card">
-                            <a href=""><img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt=""></a>
-                            <div class="card-metadata">
-                                <strong><a href="">Citizen TV</a></strong>
-                                <div class="row-items">
-                                    <span><i class="far fa-eye"></i> 1.4 M </span>
-                                    <span><i class="far fa-star"></i> 4.9</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ke-item-card">
-                            <a href=""><img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt=""></a>
-                            <div class="card-metadata">
-                                <strong><a href="">Citizen TV</a></strong>
-                                <div class="row-items">
-                                    <span><i class="far fa-eye"></i> 1.4 M </span>
-                                    <span><i class="far fa-star"></i> 4.9</span>
-                                </div>
-                            </div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>

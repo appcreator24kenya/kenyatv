@@ -1,16 +1,49 @@
 <?php
     require_once __DIR__ . '/../config/constants.php';
+    require_once __DIR__ . '/../plugins/simplepie-master/autoloader.php';
+
+    // 1. Fetch news sources from database
+    $newsSources = fetchNewsList() ?? [];
+
+    // 2. Cache Setup
+    $cacheDir = __DIR__ . '/../cache';
+    if (!is_dir($cacheDir)) {
+        mkdir($cacheDir, 0755, true);
+    }
+
+    // 3. Process each feed in its own SimplePie instance
+    $feedObjects = [];
+
+    foreach ($newsSources as $source) {
+        if (isset($source['status']) && $source['status'] === 'Publish' && !empty($source['feed_url'])) {
+            
+            $sp = new SimplePie();
+            $sp->set_feed_url($source['feed_url']);
+            
+            // Cache & performance settings
+            $sp->enable_cache(true);
+            $sp->set_cache_location($cacheDir);
+            $sp->set_cache_duration(1800); // 30 minutes
+            $sp->set_timeout(3); // 3s network cutoff
+            $sp->set_autodiscovery_level(SIMPLEPIE_LOCATOR_NONE);
+            
+            $sp->init();
+            $sp->handle_content_type();
+
+            if (!$sp->error()) {
+                // Store feed instance keyed by feed URL
+                $feedObjects[$source['feed_url']] = [
+                    'meta' => $source,
+                    'feed' => $sp
+                ];
+            }
+        }
+    }
 
     // seo meta tags
-    // $meta_title = "Kenya Live TV | Kenya TV Channels | Kenya TV Stations";
-    // $meta_description = "Explore Kenya Live TV! Dive into a world of entertainment, news and knowledge with 150 Kenya TV channels, 217 Kenya radio stations, 40 news sources and 150 Soap updates. Your one-stop destination for diverse content!";
-    // $meta_title = "Watch Live TV Channels from Kenya | Kenya Live TV";
-    // $meta_description = "Stream Kenya's best live TV channels online with Kenya Live TV. Watch your favorite Kenyan stations live, anytime, anywhere.";
-    // $meta_title = "Explore Live TV Channels in Kenya | Kenya Live TV";
-    // $meta_description = "Discover a variety of live TV channels from Kenya. Watch top stations streaming live online with Kenya Live TV.";
-    // $meta_title = "Watch Live TV Channels in Kenya | Kenya Live TV | TV Schedules, Shows & Radio";
-    $meta_title = "Watch Popular Live TV Channels & Radios in Kenya | Kenya Live TV";
-    $meta_description = "Stream live TV channels in Kenya on Kenya Live TV. Explore TV schedules, watch popular shows, and listen to live radio stations, all in one place.";
+    $total_news_count = count($newsSources);
+    $meta_title = "Kenya Live News | Kenya News Today | Kenya Breaking News";
+    $meta_description = "Kenya Live News  Stay updated with all the latest news available Kenya. Explore breaking news, politics, business, sports, entertainment, and more on Kenya Live TV. Your reliable source for timely and accurate information.";
 
 ?>
 <!DOCTYPE html>
@@ -35,36 +68,9 @@
     <meta name="revisit-after" content="1 days">
     <meta name="keywords" content=" Kenya live tv , kbc world cup live , Kenya TV Channels , Kenya TV stations, thapki ramogi tv , all kenya tv , all kenya tv stations app , kenya tv stations , watch kewnya tv channels , kenya tv , online kenya tv">
     <meta name="author" content="Abraham Omondi">
-    <link rel="preload" href="<?= BASE_CSS_URL .'tv-home.css'; ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="<?= BASE_CSS_URL .'tv-home.css'; ?>"></noscript>
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "Website",
-            "url": "<?= BASE_URL .'/'; ?>",
-            "name": "Kenya Live TV",
-            "headline": "<?= $meta_title; ?>",
-            "image": [
-                "<?= BASE_IMAGES_URL . 'tv-logo.png' ?>",
-                "https://kenyalivetv.co.ke/screenshot.jpg"
-            ],
-            "description": "<?= $meta_description; ?>",
-            "sameAs": [
-                "https://www.facebook.com/allkenyalivetv",
-                "https://www.twitter.com/allkenyalivetv",
-                "https://www.instagram.com/allkenyalivetv"
-            ],
-            "publisher": {
-                "@type": "Organization",
-                "name": "Kenya Live TV",
-                "logo": {
-                "@type": "ImageObject",
-                "url": "<?= BASE_IMAGES_URL . 'tv-logo.png' ?>"
-                }
-            }
-        }
-    </script>
-    <link rel="canonical" href="<?= BASE_URL .'/'; ?>">
+    <!-- <link rel="preload" href="<?= BASE_CSS_URL .'tv-home.css'; ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="<?= BASE_CSS_URL .'tv-home.css'; ?>"></noscript> -->
+    <link rel="canonical" href="<?= BASE_URL .'/news/'; ?>">
     <title><?= $meta_title; ?></title>
 </head>
 <body>
@@ -73,83 +79,51 @@
     <main>
         <!--wordpress header  -->
         <?php  require_once __DIR__ . '/../inc/header.php'; ?>
-        <div class="ads-container"></div>
+        <div class="ads-container"><?= getAdsenseAd('horizontal', 'auto'); ?></div>
         <section class="ke-two-column-layout one-column">
             <div class="ke-first-column">
                 <div class="ke-more-news-container">
-                    <div class="ke-area-holder"><i class="fa-solid fa-newspaper"></i>42 News Sources</div>
+                    <div class="ke-area-holder"><i class="fa-solid fa-newspaper"></i><?= $total_news_count .' News Sources'; ?></div>
                     <div class="ke-news-lists">
-                        <div class="ke-news-card">
-                            <div class="card-flex">
-                                <div class="card-image">
-                                    <a href="" target="_blank" rel="noopener noreferrer"><img src="https://www.kenyans.co.ke/files/kenyans-newlogo-2019-250x90-2_0.png" alt=""></a>
+                        <?php 
+                            foreach ($feedObjects as $url => $data): 
+                                $info = $data['meta'];
+                                $sp   = $data['feed'];
+
+                                // Get the latest single item for this feed instance
+                                $items = $sp->get_items(0, 1);
+                                
+                                if (!empty($items)):
+                                    $latestNews = $items[0];
+                            ?>
+                                <div class="ke-news-card">
+                                    <div class="card-flex">
+                                        <div class="card-image">
+                                            <a href="<?= BASE_URL . '/news/' . htmlspecialchars($info['source_slug']); ?>" target="_blank" rel="noopener noreferrer">
+                                                <img src="<?= htmlspecialchars($info['source_icon_url']); ?>" alt="<?= htmlspecialchars($info['source_name']); ?>">
+                                            </a>
+                                        </div>
+                                        <div class="card-column">
+                                            <div class="card-origin-name"><?= htmlspecialchars($info['source_name']); ?></div>
+                                            <div class="card-datetime"><?= htmlspecialchars($latestNews->get_date('M d, Y \a\t h:i A')); ?></div>
+                                        </div>
+                                    </div>
+                                    <div class="card-title">
+                                        <a href="<?= htmlspecialchars($latestNews->get_permalink()); ?>" target="_blank" rel="noopener noreferrer">
+                                            <?= htmlspecialchars($latestNews->get_title()); ?>
+                                        </a>
+                                    </div>
+                                    <div class="card-description">
+                                        <?= htmlspecialchars(mb_strimwidth(strip_tags($latestNews->get_description()), 0, 160, '...')); ?>
+                                    </div>
                                 </div>
-                                <div class="card-column">
-                                    <div class="card-origin-name">Kenyans.co.ke</div>
-                                    <div class="card-datetime">Aug 27, 2026 at 09:40 AM</div>
-                                </div>
-                            </div>
-                            <div class="card-title"><a href="" target="_blank" rel="noopener noreferrer">KMTC Introduces New Courses Across All Campuses</a></div>
-                            <div class="card-description">The newly introduced programmes add to more than 126 courses currently offered by the college, alongside a range of short courses.</div>
-                        </div>
-                        <div class="ke-news-card">
-                            <div class="card-flex">
-                                <div class="card-image"><a href="" target="_blank" rel="noopener noreferrer"><img src="https://www.kenyans.co.ke/files/kenyans-newlogo-2019-250x90-2_0.png" alt=""></a></div>
-                                <div class="card-column">
-                                    <div class="card-origin-name">Kenyans.co.ke</div>
-                                    <div class="card-datetime">Aug 27, 2026 at 09:40 AM</div>
-                                </div>
-                            </div>
-                            <div class="card-title"><a href="" target="_blank" rel="noopener noreferrer">KMTC Introduces New Courses Across All Campuses</a></div>
-                            <div class="card-description">The newly introduced programmes add to more than 126 courses currently offered by the college, alongside a range of short courses.</div>
-                        </div>
-                        <div class="ke-news-card">
-                            <div class="card-flex">
-                                <div class="card-image"><a href="" target="_blank" rel="noopener noreferrer"><img src="https://www.kenyans.co.ke/files/kenyans-newlogo-2019-250x90-2_0.png" alt=""></a></div>
-                                <div class="card-column">
-                                    <div class="card-origin-name">Kenyans.co.ke</div>
-                                    <div class="card-datetime">Aug 27, 2026 at 09:40 AM</div>
-                                </div>
-                            </div>
-                            <div class="card-title"><a href="" target="_blank" rel="noopener noreferrer">KMTC Introduces New Courses Across All Campuses</a></div>
-                            <div class="card-description">The newly introduced programmes add to more than 126 courses currently offered by the college, alongside a range of short courses.</div>
-                        </div>
-                        <div class="ke-news-card">
-                            <div class="card-flex">
-                                <div class="card-image"><a href="" target="_blank" rel="noopener noreferrer"><img src="https://www.kenyans.co.ke/files/kenyans-newlogo-2019-250x90-2_0.png" alt=""></a></div>
-                                <div class="card-column">
-                                    <div class="card-origin-name">Kenyans.co.ke</div>
-                                    <div class="card-datetime">Aug 27, 2026 at 09:40 AM</div>
-                                </div>
-                            </div>
-                            <div class="card-title"><a href="" target="_blank" rel="noopener noreferrer">KMTC Introduces New Courses Across All Campuses</a></div>
-                            <div class="card-description">The newly introduced programmes add to more than 126 courses currently offered by the college, alongside a range of short courses.</div>
-                        </div>
-                        <div class="ke-news-card">
-                            <div class="card-flex">
-                                <div class="card-image"><a href="" target="_blank" rel="noopener noreferrer"><img src="https://www.kenyans.co.ke/files/kenyans-newlogo-2019-250x90-2_0.png" alt=""></a></div>
-                                <div class="card-column">
-                                    <div class="card-origin-name">Kenyans.co.ke</div>
-                                    <div class="card-datetime">Aug 27, 2026 at 09:40 AM</div>
-                                </div>
-                            </div>
-                            <div class="card-title"><a href="" target="_blank" rel="noopener noreferrer">KMTC Introduces New Courses Across All Campuses</a></div>
-                            <div class="card-description">The newly introduced programmes add to more than 126 courses currently offered by the college, alongside a range of short courses.</div>
-                        </div>
-                        <div class="ke-news-card">
-                            <div class="card-flex">
-                                <div class="card-image"><a href="" target="_blank" rel="noopener noreferrer"><img src="https://www.kenyans.co.ke/files/kenyans-newlogo-2019-250x90-2_0.png" alt=""></a></div>
-                                <div class="card-column">
-                                    <div class="card-origin-name">Kenyans.co.ke</div>
-                                    <div class="card-datetime">Aug 27, 2026 at 09:40 AM</div>
-                                </div>
-                            </div>
-                            <div class="card-title"><a href="" target="_blank" rel="noopener noreferrer">KMTC Introduces New Courses Across All Campuses</a></div>
-                            <div class="card-description">The newly introduced programmes add to more than 126 courses currently offered by the college, alongside a range of short courses.</div>
-                        </div>
+                            <?php 
+                                endif; 
+                            endforeach; 
+                        ?>
                     </div>
                 </div>
-                <div class="ads-container"></div>
+                <div class="ads-container"><?= getAdsenseAd('horizontal', 'auto'); ?></div>
             </div>
         </section>
         <!--wordpress footer  -->

@@ -1,5 +1,5 @@
 <?php 
-    // include '../config/constants.php'; 
+    require_once __DIR__ . '/../config/constants.php';
     
     // Get the error status code from the URL query parameter (default to 404 if not set)
     $status_code = isset($_GET['code']) ? intval($_GET['code']) : 404;

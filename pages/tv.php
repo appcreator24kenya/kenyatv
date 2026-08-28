@@ -1,16 +1,36 @@
 <?php
     require_once __DIR__ . '/../config/constants.php';
 
-    // seo meta tags
-    // $meta_title = "Kenya Live TV | Kenya TV Channels | Kenya TV Stations";
-    // $meta_description = "Explore Kenya Live TV! Dive into a world of entertainment, news and knowledge with 150 Kenya TV channels, 217 Kenya radio stations, 40 news sources and 150 Soap updates. Your one-stop destination for diverse content!";
-    // $meta_title = "Watch Live TV Channels from Kenya | Kenya Live TV";
-    // $meta_description = "Stream Kenya's best live TV channels online with Kenya Live TV. Watch your favorite Kenyan stations live, anytime, anywhere.";
-    // $meta_title = "Explore Live TV Channels in Kenya | Kenya Live TV";
-    // $meta_description = "Discover a variety of live TV channels from Kenya. Watch top stations streaming live online with Kenya Live TV.";
-    // $meta_title = "Watch Live TV Channels in Kenya | Kenya Live TV | TV Schedules, Shows & Radio";
-    $meta_title = "Watch Popular Live TV Channels & Radios in Kenya | Kenya Live TV";
-    $meta_description = "Stream live TV channels in Kenya on Kenya Live TV. Explore TV schedules, watch popular shows, and listen to live radio stations, all in one place.";
+    $all_channels = fetchCountRowsInAllTables('channels');
+    $all_radios = fetchCountRowsInAllTables('radios');
+    $all_soaps = fetchCountRowsInAllTables('soaps');
+    $all_setbooks = fetchCountRowsInAllTables('setbooks');
+    $all_news = fetchCountRowsInAllTables('news');
+    $live_users = fetchCountRowsInAllTables('online_viewers'); 
+
+    // Fetch all channels
+    $channels = fetchTVList() ?? [];
+    
+    // Prepare the $allChannels array
+    $allChannels = [];
+    if ($channels) {
+        foreach ($channels as $index => $row) {
+            $allChannels[$index]['id'] = $row['id'];
+            $allChannels[$index]['channel_name'] = $row['channel_name'];
+            $allChannels[$index]['channel_slug'] = $row['channel_slug'];
+            $allChannels[$index]['channel_icon'] = $row['channel_icon'];
+            $allChannels[$index]['tv_embed_code'] = $row['tv_embed_code'];
+            $allChannels[$index]['tv_description'] = $row['tv_description'];
+            $allChannels[$index]['status'] = $row['status'];
+            $allChannels[$index]['channel_poster'] = $row['channel_poster'];
+            $allChannels[$index]['viewed'] = $row['viewed'];
+            $allChannels[$index]['created'] = $row['created'];
+        }
+    }
+
+    $total_tv_count = count($allChannels);
+    $meta_title = $total_tv_count . " Kenya TV Channels | " . SITE_NAME;
+    $meta_description = "Watch all Kenya TV channels live online on Kenyalivetv.co.ke. Live stream news , tv shows , sports & movies";
 
 ?>
 <!DOCTYPE html>
@@ -73,162 +93,37 @@
     <main>
         <!--wordpress header  -->
         <?php  require_once __DIR__ . '/../inc/header.php'; ?>
-        <div class="ads-container"></div>
+        <div class="ads-container"><?= getAdsenseAd('horizontal', 'auto'); ?></div>
         <section class="ke-two-column-layout one-column">
             <div class="ke-first-column">
                 <div class="ke-more-channels-container">
-                    <div class="ke-area-holder"><i class="fa-solid fa-tv"></i>125 TV Channels</div>
+                    <div class="ke-area-holder"><i class="fa-solid fa-tv"></i><?= $total_tv_count .' TV Channels'; ?></div>
                     <div class="ke-channel-lists">
+                        <?php 
+                        if($allChannels){
+                        foreach($allChannels as $key => $row){
+                            $id = $row['id'];
+                            $channel_name= trim($row['channel_name']);
+                            $channel_icon= $row['channel_icon'];
+                            $channel_slug = $row['channel_slug'];
+                            $channel_poster = $row['channel_poster'];
+                            $status = $row['status'];
+                            $viewed = $row['viewed'];
+
+                        ?>
                         <div class="ke-channel-card">
                             <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
+                                <a href="<?= BASE_URL . "/tv/" . $channel_slug; ?>">
+                                    <img src="<?= $channel_icon; ?>" loading="lazy" alt="<?= $channel_name; ?>">
+                                </a>
+                                <div class="channel-status <?= ($status == 'Live Now') ? ' live-now' : ' off-air'; ?>"><?= $status; ?></div>
                             </div>
-                            <div class="channel-name">Citizen TV</div>
+                            <div class="channel-name"><?= $channel_name; ?></div>
                         </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status off-air">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status live-now">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
-                        <div class="ke-channel-card">
-                            <div class="channel-image">
-                                <img src="https://kenyalivetv.co.ke/uploads/tv/1_icon_citizentv.webp" alt="">
-                                <div class="channel-status">Live Now</div>
-                            </div>
-                            <div class="channel-name">Citizen TV</div>
-                        </div>
+                        <?php } } ?>
                     </div>
                 </div>
-                <div class="ads-container"></div>
+                <div class="ads-container"><?= getAdsenseAd('horizontal', 'auto'); ?></div>
             </div>
         </section>
         <!--wordpress footer  -->
