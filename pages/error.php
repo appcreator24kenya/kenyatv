@@ -84,5 +84,8 @@
             </p>
         </div>
     </div>
+    <!--Start of Tawk.to Script-->
+    <?php require_once  __DIR__ . '/../inc/chat.php'; ?>
+    <!--End of Tawk.to Script-->
 </body>
 </html>
