@@ -125,6 +125,10 @@ main {
         grid-template-columns: 2.8fr 1.2fr;
         gap: 20px;
 
+        @media (max-width:881px) {
+            grid-template-columns: 1fr;
+        }
+
         &.one-column {
             grid-template-columns: 1fr;
 
@@ -423,6 +427,7 @@ main {
                         display: flex;
                         align-items: center;
                         gap: 10px;
+                        overflow: hidden;
         
                         & a:where(img) {
                             width: 40px;
